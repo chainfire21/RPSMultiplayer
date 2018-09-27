@@ -14,16 +14,42 @@
 
 <body>
     <div class="container">
-        <div class="row">
-            <div class="col">
-                <div class="btn-group" role="group" aria-label="Basic example">
+        <div class="jumbotron jumbotron-fluid">
+            <div class="container text-center">
+                <h1 class="display-4">Rock Paper Scissors....MULTIPLAYER</h1>
+            </div>
+        </div>
+        <form>
+            <div class="form-group row mb-2 justify-content-center col-2 offset-5">
+                <label for="name-input">Player name</label>
+                <input type="text" class="form-control" id="name-input" placeholder="Name">
+            </div>
+        </form>
+        <div class="row justify-content-around">
+            <div class = "col-2" id="waitingP1">
+                <div class="card" style="width: 18rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">Input name to play!</h5>
+                        <p class="card-text">Input name to play!</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col d-none justify-content-center" id="btnsP1">
+                <div class="btn-group-vertical" role="group" aria-label="Basic example">
                     <button type="button" class="btn btn-secondary p1">Rock</button>
                     <button type="button" class="btn btn-secondary p1">Paper</button>
                     <button type="button" class="btn btn-secondary p1">Scissors</button>
                 </div>
             </div>
-            <div class="col">
-                <div class="btn-group" role="group" aria-label="Basic example">
+            <div class="card col-2" style="width: 18rem;" id="waitingP2">
+                <div class="card-body">
+                    <h5 class="card-title">Card title</h5>
+                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
+                        card's content.</p>
+                </div>
+            </div>
+            <div class="col d-none justify-content-center" id="btnsP2">
+                <div class="btn-group-vertical" role="group" aria-label="Basic example">
                     <button type="button" class="btn btn-secondary p2">Rock</button>
                     <button type="button" class="btn btn-secondary p2">Paper</button>
                     <button type="button" class="btn btn-secondary p2">Scissors</button>
