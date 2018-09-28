@@ -49,84 +49,180 @@ $(document).ready(function () {
     const player = {
         name: "",
         choice: "",
-        type: "",
+        type: "guest",
     }
+
+    const state = [""];
+
     $("form").submit(function (e) {
         e.preventDefault();
+        player.name = $("#name-input").val();
+        $("#form-name")[0].reset();
         //set the connection with the name of the user
-        database.ref(`/connections/${userCon[0]}`).set({
-            name: $("#name-input").val(),
-        });
+        database.ref(`/connections/${userCon[0]}`).set(player);
 
-        database.ref("/connections").on("value", function (snapshot) {
-            //make sure this logic is only done on creation of a player
-            if (player.name === "") {
-                //check to see if player one exists
-                database.ref().child("playerOne").once("value", snapshot => {
-                    if (snapshot.exists()) {
-                        console.log("player one snapshot here");
+    });
 
-                        //check gto see if player two exists
-                        database.ref().child("playerTwo").once("value", snapshot => {
-                            if (snapshot.exists()) {
-                                console.log("player two snapshot here");
-                                player.name = $("#name-input").val();
-                                player.type = "guest";
-
-                            }
-                            //no player two, make it
-                            else {
-                                console.log("no player two");
-                                $("#btnsP2").removeClass("d-none").addClass("d-flex");
-                                $("#waitingP2").addClass("d-none");
-                                player.name = $("#name-input").val();
-                                player.type = "two";
-                                database.ref("/connections/playerTwo").set(true);
-                                database.ref(`/connections/${userCon[0]}`).set(player);
-                                database.ref("playerOne").set(true);
-                            }
-                        });
-                    }
-                    //no players, make player one
-                    else {
-                        console.log("no player one");
-                        $("#btnsP1").removeClass("d-none").addClass("d-flex");
-                        $("#waitingP1").addClass("d-none");
-                        player.name = $("#name-input").val();
-                        player.type = "one";
-                        database.ref("/connections/playerOne").set(true);
-                        database.ref(`/connections/${userCon[0]}`).set(player);
-                        database.ref("playerOne").set(true);
-                    }
-                });
-            }
-
-        });
-    })
-
+    //listen for player one to click rock paper or scissors
     $("body").on("click", ".p1", function (e) {
         console.log($(this).text());
         $("#p1-choice").text($(this).text());
-        database.ref("playerOne").set({
-            choice: $(this).text(),
+        player.choice = $(this).text();
+        database.ref(`/connections/${userCon[0]}`).set(player);
+        //send the choice to the database
+        database.ref(`/playerOneC`).set({ choice: player.choice });
+        database.ref().child("playerTwoC").once("value", function (snapshot) {
+            if (snapshot.exists()) {
+                switch (player.choice) {
+                    case "Rock":
+                        if (snapshot.val().choice === "Rock") {
+                            console.log("tie");
+                        }
+                        if (snapshot.val().choice === "Paper") {
+                            console.log("loss p1");
+                        }
+                        if (snapshot.val().choice === "Scissors") {
+                            console.log("win p1");
+                        }
+                        break;
+                    case "Paper":
+                        if (snapshot.val().choice === "Rock") {
+                            console.log("win p1");
+                        }
+                        if (snapshot.val().choice === "Paper") {
+                            console.log("tie");
+                        }
+                        if (snapshot.val().choice === "Scissors") {
+                            console.log("loss p1");
+                        }
+                        break;
+                    case "Scissors":
+                        if (snapshot.val().choice === "Rock") {
+                            console.log("loss p1");
+                        }
+                        if (snapshot.val().choice === "Paper") {
+                            console.log("win p1");
+                        }
+                        if (snapshot.val().choice === "Scissors") {
+                            console.log("tie");
+                        }
+                        break;
+                }
+            }
         });
 
     });
 
+    //listen for player two to click rock paper or scissors
     $("body").on("click", ".p2", function (e) {
         console.log($(this).text());
         $("#p2-choice").text($(this).text());
-        database.ref("/players/playerTwo").set({
-            choice: $(this).text(),
+        player.choice = $(this).text();
+        database.ref(`/connections/${userCon[0]}`).set(player);
+        //send the choice to the database
+        database.ref(`/playerTwoC`).set({ choice: player.choice });
+        
+        database.ref().child("playerOneC").once("value", function (snapshot) {
+            //if the other player has guessed check to see who won
+            if (snapshot.exists()) {
+                console.log(snapshot.val().choice);
+                switch (player.choice) {
+                    case "Rock":
+                        if (snapshot.val().choice === "Rock") {
+                            console.log("tie");
+                        }
+                        if (snapshot.val().choice === "Paper") {
+                            console.log("win p1");
+                        }
+                        if (snapshot.val().choice === "Scissors") {
+                            console.log("loss p1");
+                        }
+                        break;
+                    case "Paper":
+                        if (snapshot.val().choice === "Rock") {
+                            console.log("loss p1");
+                        }
+                        if (snapshot.val().choice === "Paper") {
+                            console.log("tie");
+                        }
+                        if (snapshot.val().choice === "Scissors") {
+                            console.log("win p1");
+                        }
+                        break;
+                    case "Scissors":
+                        if (snapshot.val().choice === "Rock") {
+                            console.log("win p1");
+                        }
+                        if (snapshot.val().choice === "Paper") {
+                            console.log("loss p1");
+                        }
+                        if (snapshot.val().choice === "Scissors") {
+                            console.log("tie");
+                        }
+                        break;
+                }
+            }
         });
     });
 
-
-    database.ref("/players/playerOne").on("value", function (snapshot) {
-        console.log(snapshot.val());
+    //when a connection is lost or gained
+    database.ref("/connections").on("value", function (snap) {
+        //call function to see what players are connected, p1, p2, both, or just p2, or none
+        stateOfPlayers();
+        switch (state[0]) {
+            //only p1, so make new person p2
+            case "p1":
+                console.log("no player two");
+                $("#btnsP2").removeClass("d-none").addClass("d-flex");
+                $("#waitingP2").addClass("d-none");
+                player.type = "two";
+                database.ref(`/connections/${userCon[0]}`).set(player);
+                break;
+            //both p1 and p2 exist, person stays as a guest type but has name now
+            case "p1p2":
+                console.log("player two snapshot here");
+                player.type = "guest";
+                database.ref(`/connections/${userCon[0]}`).set(player);
+                break;
+            //only p2 connected, shift guest to p1
+            case "p2":
+                console.log("no player one but there is player 2");
+                $("#btnsP1").removeClass("d-none").addClass("d-flex");
+                $("#waitingP1").addClass("d-none");
+                player.type = "one";
+                database.ref(`/connections/${userCon[0]}`).set(player);
+                break;
+            //no players, make them p1
+            case "noPs":
+                console.log("no player one");
+                $("#btnsP1").removeClass("d-none").addClass("d-flex");
+                $("#waitingP1").addClass("d-none");
+                $("#p2-display").text("Waiting for opponent");
+                player.type = "one";
+                database.ref(`/connections/${userCon[0]}`).set(player);
+                break;
+        }
     });
-    database.ref("/players/playerTwo").on("value", function (snapshot) {
-        console.log(snapshot.val());
-    });
 
+    function stateOfPlayers() {
+        state[0] = "";
+        if (player.type === "guest" && player.name !== "") {
+            state[0] = "noPs";
+            database.ref().child("connections").orderByChild("type").equalTo("one").once("value", function (snapshot) {
+                if (snapshot.exists()) {
+                    state[0] = "p1";
+                }
+            });
+            database.ref().child("connections").orderByChild("type").equalTo("two").once("value", function (snapshot) {
+                if (snapshot.exists()) {
+                    if (state[0] === "p1") {
+                        state[0] = "p1p2";
+                    }
+                    else {
+                        state[0] = "p2";
+                    }
+                }
+            });
+        }
+    }
 });
