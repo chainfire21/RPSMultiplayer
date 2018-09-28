@@ -70,47 +70,7 @@ $(document).ready(function () {
         player.choice = $(this).text();
         database.ref(`/connections/${userCon[0]}`).set(player);
         //send the choice to the database
-        database.ref(`/playerOneC`).set({ choice: player.choice });
-        database.ref().child("playerTwoC").once("value", function (snapshot) {
-            if (snapshot.exists()) {
-                switch (player.choice) {
-                    case "Rock":
-                        if (snapshot.val().choice === "Rock") {
-                            console.log("tie");
-                        }
-                        if (snapshot.val().choice === "Paper") {
-                            console.log("loss p1");
-                        }
-                        if (snapshot.val().choice === "Scissors") {
-                            console.log("win p1");
-                        }
-                        break;
-                    case "Paper":
-                        if (snapshot.val().choice === "Rock") {
-                            console.log("win p1");
-                        }
-                        if (snapshot.val().choice === "Paper") {
-                            console.log("tie");
-                        }
-                        if (snapshot.val().choice === "Scissors") {
-                            console.log("loss p1");
-                        }
-                        break;
-                    case "Scissors":
-                        if (snapshot.val().choice === "Rock") {
-                            console.log("loss p1");
-                        }
-                        if (snapshot.val().choice === "Paper") {
-                            console.log("win p1");
-                        }
-                        if (snapshot.val().choice === "Scissors") {
-                            console.log("tie");
-                        }
-                        break;
-                }
-            }
-        });
-
+        database.ref(`/choices/p1Choice`).set({ p1choice: player.choice });
     });
 
     //listen for player two to click rock paper or scissors
@@ -120,49 +80,15 @@ $(document).ready(function () {
         player.choice = $(this).text();
         database.ref(`/connections/${userCon[0]}`).set(player);
         //send the choice to the database
-        database.ref(`/playerTwoC`).set({ choice: player.choice });
-        
-        database.ref().child("playerOneC").once("value", function (snapshot) {
-            //if the other player has guessed check to see who won
-            if (snapshot.exists()) {
-                console.log(snapshot.val().choice);
-                switch (player.choice) {
-                    case "Rock":
-                        if (snapshot.val().choice === "Rock") {
-                            console.log("tie");
-                        }
-                        if (snapshot.val().choice === "Paper") {
-                            console.log("win p1");
-                        }
-                        if (snapshot.val().choice === "Scissors") {
-                            console.log("loss p1");
-                        }
-                        break;
-                    case "Paper":
-                        if (snapshot.val().choice === "Rock") {
-                            console.log("loss p1");
-                        }
-                        if (snapshot.val().choice === "Paper") {
-                            console.log("tie");
-                        }
-                        if (snapshot.val().choice === "Scissors") {
-                            console.log("win p1");
-                        }
-                        break;
-                    case "Scissors":
-                        if (snapshot.val().choice === "Rock") {
-                            console.log("win p1");
-                        }
-                        if (snapshot.val().choice === "Paper") {
-                            console.log("loss p1");
-                        }
-                        if (snapshot.val().choice === "Scissors") {
-                            console.log("tie");
-                        }
-                        break;
-                }
-            }
-        });
+        database.ref(`/choices/p2Choice`).set({ p2choice: player.choice });
+    });
+
+    database.ref("/choices").on("value", function (snap) {
+        console.log("choices updated");
+        if(snap.hasChild("p1Choice")&&snap.hasChild("p2Choice")){
+            gameLogic(snap.val().p1Choice.p1choice,snap.val().p2Choice.p2choice);
+            removeChoices();
+        }
     });
 
     //when a connection is lost or gained
@@ -224,5 +150,47 @@ $(document).ready(function () {
                 }
             });
         }
+    }
+
+    function gameLogic(p1, p2) {
+        switch (p1) {
+            case "Rock":
+                if (p2 === "Rock") {
+                    console.log("tie");
+                }
+                if (p2 === "Paper") {
+                    console.log("p2 wins");
+                }
+                if (p2 === "Scissors") {
+                    console.log("p1 wins")
+                }
+                break;
+            case "Paper":
+                if (p2 === "Rock") {
+                    console.log("p1 wins");
+                }
+                if (p2 === "Paper") {
+                    console.log("tie");
+                }
+                if (p2 === "Scissors") {
+                    console.log("p2 wins")
+                }
+                break;
+            case "Scissors":
+                if (p2 === "Rock") {
+                    console.log("p2 wins");
+                }
+                if (p2 === "Paper") {
+                    console.log("p1 wins");
+                }
+                if (p2 === "Scissors") {
+                    console.log("tie")
+                }
+                break;
+        }
+    }
+
+    function removeChoices(){
+        database.ref("/choices").remove();
     }
 });
