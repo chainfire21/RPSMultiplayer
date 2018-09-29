@@ -14,7 +14,7 @@
 
 <body>
     <div class="container">
-        <div class="jumbotron jumbotron-fluid">
+        <div class="row jumbotron jumbotron-fluid">
             <div class="container text-center">
                 <h1 class="display-4">Rock Paper Scissors....MULTIPLAYER</h1>
             </div>
@@ -25,9 +25,13 @@
                 <input type="text" class="form-control" id="name-input" placeholder="Name">
             </div>
         </form>
+        <div class="row d-none justify-content-center" id = "inputted-name">
+            <h4>Welcome <span id="player-name"></span></h4>
+        </div>
         <div class="row justify-content-around">
             <div class="card col-2" style="width: 18rem;" id="waitingP1">
                 <div class="card-body">
+                    <h5 class = "card-title" id="p1-name"></h5>
                     <h5 class="card-title" id="p1-display">Input name to play!</h5>
                 </div>
             </div>
@@ -40,6 +44,7 @@
             </div>
             <div class="card col-2" style="width: 18rem;" id="waitingP2">
                 <div class="card-body">
+                        <h5 class = "card-title" id="p2-name"></h5>
                     <h5 class="card-title" id="p2-display">Input name to play!</h5>
                 </div>
             </div>
@@ -51,12 +56,32 @@
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col">
-                <p>Player 1 chose <span id="p1-choice"></span></p>
+        <div class="row justify-content-around">
+            <div class="col-3">
+                <p class="text-center">Player 1 wins: <span id="p1-wins">0</span><br>Player 1 losses: <span id="p1-loss">0</span></p>
             </div>
-            <div class="col">
-                <p>Player 2 chose <span id="p2-choice"></span></p>
+            <div class="col-3">
+                <p class="text-center">Ties: <span id="ties">0</span></p>
+            </div>
+            <div class="col-3">
+                <p class="text-center">Player 2 wins: <span id="p2-wins">0</span><br>Player 2 losses: <span id="p2-loss">0</span></p>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card" id="chatBox">
+                    <div class="card-body">
+                        <p class="text-center">Chat!</p>
+                        <div id="chatBoxArea"></div>
+                        <div class="input-group mb-3" id="chatBoxInput">
+                            <input type="text" id="chatInput" class="form-control" placeholder="Write message..."
+                                aria-label="Recipient's username" aria-describedby="basic-addon2">
+                            <div class="input-group-append">
+                                <button id="chatBtn" class="btn btn-info" type="button">Send</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
