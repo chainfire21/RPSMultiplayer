@@ -21,7 +21,7 @@
         </div>
         <form id="form-name">
             <div class="form-group row mb-2 justify-content-center col-2 offset-5">
-                <label for="name-input">Player name</label>
+                <label for="name-input">Input Name To Play:</label>
                 <input type="text" class="form-control" id="name-input" placeholder="Name">
             </div>
         </form>
@@ -29,10 +29,10 @@
             <h4>Welcome <span id="player-name"></span></h4>
         </div>
         <div class="row justify-content-around">
-            <div class="card col-2" style="width: 18rem;" id="waitingP1">
+            <div class="card col-3" style="width: 18rem;" id="waitingP1">
                 <div class="card-body">
                     <h5 class = "card-title" id="p1-name"></h5>
-                    <h5 class="card-title" id="p1-display">Input name to play!</h5>
+                    <h5 class="card-title" id="p1-display">Waiting for players!</h5>
                 </div>
             </div>
             <div class="col-2 d-none justify-content-center" id="btnsP1">
@@ -42,10 +42,11 @@
                     <button type="button" class="btn btn-secondary p1">Scissors</button>
                 </div>
             </div>
-            <div class="card col-2" style="width: 18rem;" id="waitingP2">
+            <div id = "who-won"></div>
+            <div class="card col-3" style="width: 18rem;" id="waitingP2">
                 <div class="card-body">
                         <h5 class = "card-title" id="p2-name"></h5>
-                    <h5 class="card-title" id="p2-display">Input name to play!</h5>
+                    <h5 class="card-title" id="p2-display">Waiting for players!</h5>
                 </div>
             </div>
             <div class="col-2 d-none justify-content-center" id="btnsP2">
@@ -58,13 +59,13 @@
         </div>
         <div class="row justify-content-around">
             <div class="col-3">
-                <p class="text-center">Player 1 wins: <span id="p1-wins">0</span><br>Player 1 losses: <span id="p1-loss">0</span></p>
+                <p class="text-center">Player 1 wins: <span id="p1-wins">0</span></p>
             </div>
             <div class="col-3">
                 <p class="text-center">Ties: <span id="ties">0</span></p>
             </div>
             <div class="col-3">
-                <p class="text-center">Player 2 wins: <span id="p2-wins">0</span><br>Player 2 losses: <span id="p2-loss">0</span></p>
+                <p class="text-center">Player 2 wins: <span id="p2-wins">0</span></p>
             </div>
         </div>
         <div class="row justify-content-center">

@@ -72,7 +72,6 @@ $(document).ready(function () {
 
     //listen for player one to click rock paper or scissors
     $("body").on("click", ".p1", function (e) {
-        console.log($(this).text());
         $("#p1-choice").text($(this).text());
         player.choice = $(this).text();
         database.ref(`/connections/${userCon[0]}`).set(player);
@@ -105,16 +104,24 @@ $(document).ready(function () {
     });
 
     database.ref("/choices").on("value", function (snap) {
-        console.log("choices updated");
         if (snap.hasChild("p1Choice") && snap.hasChild("p2Choice")) {
             gameLogic(snap.val().p1Choice.p1choice, snap.val().p2Choice.p2choice);
             removeChoices();
+            $("#p1-display").text("Waiting for your opponent to choose");
+            $("#p2-display").text("Waiting for your opponent to choose");
+        }
+        if (snap.hasChild("p1Choice") && player.type==="two"){
+            $("#p1-display").text("Your opponent has chosen");
+        }
+        if (snap.hasChild("p2Choice") && player.type==="one"){
+            $("#p2-display").text("Your opponent has chosen");
         }
     });
 
     //when a connection is lost or gained
     database.ref("/connections").on("value", function (snap) {
         //call function to see what players are connected, p1, p2, both, or just p2, or none
+        console.log("state of players in ref connections");
         stateOfPlayers();
         switch (state[0]) {
             //only p1, so make new person p2
@@ -163,6 +170,7 @@ $(document).ready(function () {
                 break;
         }
         if (player.type === "one" && snap.numChildren() > 1) {
+            $("#p2-display").text("Waiting for opponent to choose");
             displayPlayer2();
         }
     });
@@ -172,7 +180,6 @@ $(document).ready(function () {
             scores.P1wins = snapshot.val().P1wins;
             scores.P2wins = snapshot.val().P2wins;
             scores.tie = snapshot.val().tie;
-            console.log(scores);
         }
         else {
             database.ref("/scores").set(scores);
@@ -180,11 +187,8 @@ $(document).ready(function () {
     });
 
     database.ref("/scores").on("value", function (snapshot) {
-        console.log("updating text");
         $("#p1-wins").text(snapshot.val().P1wins);
         $("#p2-wins").text(snapshot.val().P2wins);
-        $("#p1-loss").text(snapshot.val().P2wins);
-        $("#p2-loss").text(snapshot.val().P1wins);
         $("#ties").text(snapshot.val().tie);
 
     });
@@ -206,37 +210,43 @@ $(document).ready(function () {
 
     function displayPlayer1() {
         database.ref().child("/displayP1").once("value", function (snapshot) {
-            $("#p1-name").text(snapshot.val().name);
+            $("#p1-name").text("Your opponent: "+snapshot.val().name);
         });
     }
 
     function displayPlayer2() {
         database.ref().child("/displayP2").once("value", function (snapshot) {
-            $("#p2-name").text(snapshot.val().name);
+            $("#p2-name").text("Your opponent: "+snapshot.val().name);
         });
     }
 
     function winP1() {
         scores.P1wins++;
+        $("#who-won").html($("<div class = 'alert alert-success' role = 'alert'>").text("Player One Won!"));
         database.ref("/scores").set(scores);
     }
 
     function winP2() {
         scores.P2wins++;
+        $("#who-won").html($("<div class = 'alert alert-success' role = 'alert'>").text("Player Two Won!"));
         database.ref("/scores").set(scores);
     }
 
     function tie() {
         scores.tie++;
+        $("#who-won").html($("<div class = 'alert alert-danger' role = 'alert'>").text("A Tie!"));
         database.ref("/scores").set(scores);
     }
 
     function stateOfPlayers() {
         state[0] = "";
+        console.log("outside state of players if");
         if (player.type === "guest" && player.name !== "") {
+            console.log("inside state of players if");
             state[0] = "noPs";
             database.ref().child("connections").orderByChild("type").equalTo("one").once("value", function (snapshot) {
                 if (snapshot.exists()) {
+                    console.log("inside state of players if and p1 exists");
                     state[0] = "p1";
                 }
             });
